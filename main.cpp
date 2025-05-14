@@ -23,6 +23,9 @@
 
 #define NUM_DEVICES 3
 
+#define tx_size 6
+static const char tx_buffer[tx_size] = "hello";
+
 /**
  * The BMP280 sensor data structure.
  */
@@ -34,7 +37,7 @@ bmp280_data_t bmp280_data;
  */
 typedef struct {
     bmp280_data_t bmp280_data;
-    uint8_t data[3];
+    const int data = DEVICE_ID;
 } payload_t;
 
 /**
@@ -73,7 +76,8 @@ void receive_task(void *pvParameters) {
                 receive_from_device(i, &receive_payload, sizeof(payload_t));
 
                 printf(
-                    "Received: Temperature: %.2f C, Pressure: %.2f hPa\n",
+                    "Received from %d: Temperature: %.2f C, Pressure: %.2f hPa\n",
+                    receive_payload.data,
                     receive_payload.bmp280_data.temperature,
                     receive_payload.bmp280_data.pressure
                 );
