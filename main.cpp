@@ -117,15 +117,9 @@ void init_values() {
     // Initialize the payloads used for communication.
     receive_payload.bmp280_data.temperature = -1;
     receive_payload.bmp280_data.pressure = -1;
-    receive_payload.data[0] = 0;
-    receive_payload.data[1] = 0;
-    receive_payload.data[2] = 0;
 
     send_payload.bmp280_data.temperature = -1;
     send_payload.bmp280_data.pressure = -1;
-    send_payload.data[0] = 0;
-    send_payload.data[1] = 0;
-    send_payload.data[2] = 0;
 }
 
 extern "C" void user_init(void);
