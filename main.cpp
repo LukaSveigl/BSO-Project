@@ -14,7 +14,6 @@
 
 #include "RF24/nRF24L01.h"
 #include "RF24/RF24.h"
-#include "nrf24.h"
 
 #include "include/comms.h"
 #include "include/election.h"

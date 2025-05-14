@@ -5,6 +5,10 @@
 
 #include "espressif/esp_common.h"
 #include "esp/uart.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "i2c/i2c.h"
+#include "ota-tftp.h"
 #include "RF24/nRF24L01.h"
 #include "RF24/RF24.h"
 
