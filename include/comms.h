@@ -26,6 +26,7 @@ const uint8_t address_device_1[] = { GROUP_PREFIX, 0x01 };
 const uint8_t address_device_2[] = { GROUP_PREFIX, 0x02 };
 const uint8_t address_device_3[] = { GROUP_PREFIX, 0x03 };
 const uint8_t* addresses[] = { address_device_1, address_device_2, address_device_3 };
+uint8_t reading_device_ids[2] = { 0x01, 0x02 };
 
 /**
  * The RF24 radio object.
@@ -37,17 +38,15 @@ static RF24 radio(CE_NRF, CS_NRF);
  *
  * @return The device IDs of the other devices in the group.
  */
-inline uint8_t* init_nrf24() {
+inline void init_nrf24() {
     gpio_enable(CS_NRF, GPIO_OUTPUT);
 
     radio.begin();
     radio.setChannel(channel);
 
-    uint8_t reading_device_ids[2] = { 0x01, 0x02 };
-
     // Open reading pipes to all other devices.
     uint8_t pipe = 1;
-    for (int i = 0; i < sizeof(addresses) / sizeof(addresses[0]); i++) {
+    for (unsigned int i = 0; i < sizeof(addresses) / sizeof(addresses[0]); i++) {
         if (addresses[i][4] != DEVICE_ID) {
             radio.openReadingPipe(pipe, addresses[i]);
             reading_device_ids[pipe - 1] = addresses[i][4];
@@ -60,8 +59,6 @@ inline uint8_t* init_nrf24() {
     radio.openWritingPipe(addresses[target_index]);
 
     radio.startListening();
-
-    return reading_device_ids;
 }
 
 /**

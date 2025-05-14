@@ -29,11 +29,6 @@
 bmp280_data_t bmp280_data;
 
 /**
- * The array of device IDs of the other devices in the group.
- */
-uint8_t* reading_device_ids;
-
-/**
  * The payload type received/transmitted over the RF24 module. The payload contains both the BMP280 data and the RF24
  * data, as both are sent in the same communication.
  */
@@ -135,7 +130,7 @@ void user_init(void){
     init_values();
 
     init_bmp280(BUS_I2C);
-    reading_device_ids = init_nrf24();
+    init_nrf24();
 
     xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
     xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
