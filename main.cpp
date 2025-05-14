@@ -134,5 +134,5 @@ void user_init(void){
 
     xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
     xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
-    xTaskCreate(sensing_task, "bmp280_task", 256, NULL, 2, NULL);
+    xTaskCreate(sensing_task, "sensing_task", 256, NULL, 2, NULL);
 }
