@@ -4,6 +4,15 @@
 #include "espressif/esp_common.h"
 #include "esp/uart.h"
 #include "bmp280/bmp280.h"
+#include "i2c/i2c.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "i2c/i2c.h"
+
+#define PCF_ADDRESS	0x38
+#define MPU_ADDRESS	0x68
+#define SCL 14
+#define SDA 12
 
 /**
  * The definitions of the BMP280 sensor quantities.
@@ -31,6 +40,9 @@ bmp280_t bmp280_device;
  * @param i2c_bus The I2C bus number.
  */
 inline void init_bmp280(int i2c_bus) {
+    i2c_init(BUS_I2C, SCL, SDA, I2C_FREQ_100K);
+    gpio_enable(SCL, GPIO_OUTPUT);
+
     bmp280_params_t params;
     bmp280_init_default_params(&params);
     params.mode = BMP280_MODE_FORCED;
