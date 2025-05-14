@@ -40,7 +40,7 @@ bmp280_t bmp280_device;
  * @param i2c_bus The I2C bus number.
  */
 inline void init_bmp280(int i2c_bus) {
-    i2c_init(BUS_I2C, SCL, SDA, I2C_FREQ_100K);
+    i2c_init(i2c_bus, SCL, SDA, I2C_FREQ_100K);
     gpio_enable(SCL, GPIO_OUTPUT);
 
     bmp280_params_t params;
