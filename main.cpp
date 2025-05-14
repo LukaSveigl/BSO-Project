@@ -73,7 +73,7 @@ void receive_task(void *pvParameters) {
                 receive_from_device(i, &receive_payload, sizeof(payload_t));
 
                 printf(
-                    "Temperature: %.2f C, Pressure: %.2f hPa\n",
+                    "Received: Temperature: %.2f C, Pressure: %.2f hPa\n",
                     receive_payload.bmp280_data.temperature,
                     receive_payload.bmp280_data.pressure
                 );
