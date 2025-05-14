@@ -41,14 +41,16 @@ bmp280_t bmp280_device;
  */
 inline void init_bmp280(int i2c_bus) {
     i2c_init(i2c_bus, SCL, SDA, I2C_FREQ_100K);
-    gpio_enable(SCL, GPIO_OUTPUT);
+    //gpio_enable(SCL, GPIO_OUTPUT);
 
     bmp280_params_t params;
     bmp280_init_default_params(&params);
     params.mode = BMP280_MODE_FORCED;
     bmp280_device.i2c_dev.bus = i2c_bus;
     bmp280_device.i2c_dev.addr = BMP280_I2C_ADDRESS_0;
-    bmp280_init(&bmp280_device, &params);
+    if (!bmp280_init(&bmp280_device, &params)) {
+        printf("Failed to initialize BMP280\n");
+    }
 }
 
 /**
@@ -61,13 +63,17 @@ inline float read_bmp280(const bmp280_quantity quantity) {
     float temperature;
     float pressure;
 
-    bmp280_force_measurement(&bmp280_device);
+    if (!bmp280_force_measurement(&bmp280_device)) {
+        printf("Failed to start forced measurement in BMP280\n");
+    }
 
     // Wait for the measurement to complete.
     while (bmp280_is_measuring(&bmp280_device)) {
     }
 
-    bmp280_read_float(&bmp280_device, &temperature, &pressure, NULL);
+    if (!bmp280_read_float(&bmp280_device, &temperature, &pressure, NULL)) {
+        printf("Failed to read data from BMP280\n");
+    }
 
     if (quantity == BMP280_TEMPERATURE) {
         return temperature;
