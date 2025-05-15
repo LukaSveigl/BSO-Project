@@ -55,17 +55,6 @@ payload_t send_payload;
 void transmit_task(void *pvParameters) {
     while (1) {
         for (int i = 0; i < NUM_DEVICES - 1; i++) {
-            gpio_write(CS_NRF, 1);
-            send_payload.bmp280_data.temperature = read_bmp280(BMP280_TEMPERATURE);
-            gpio_write(CS_NRF, 1);
-            send_payload.bmp280_data.pressure = read_bmp280(BMP280_PRESSURE);
-
-            printf("Sending to %d: Temperature: %.2f C, Pressure: %.2f Pa\n",
-                   send_payload.data,
-                   send_payload.bmp280_data.temperature,
-                   send_payload.bmp280_data.pressure);
-
-
             const uint8_t device_id = reading_device_ids[i];
             send_to_device(device_id, &send_payload, sizeof(payload_t));
 
@@ -107,8 +96,10 @@ void sensing_task(void *pvParameters) {
     while (1) {
         // Note: This should be removed, only the payload data should remain.
         gpio_write(CS_NRF, 1);
+        i2c_init(BUS_I2C, SCL, SDA, I2C_FREQ_100K);
         bmp280_data.temperature = read_bmp280(BMP280_TEMPERATURE);
         gpio_write(CS_NRF, 1);
+        i2c_init(BUS_I2C, SCL, SDA, I2C_FREQ_100K);
         bmp280_data.pressure = read_bmp280(BMP280_PRESSURE);
 
         send_payload.bmp280_data.temperature = bmp280_data.temperature;
@@ -142,10 +133,11 @@ void user_init(void){
 
     gpio_write(CS_NRF, 1);
     gpio_enable(CS_NRF, GPIO_OUTPUT);
+    gpio_enable(SCL, GPIO_OUTPUT);
     init_bmp280(BUS_I2C);
     init_nrf24();
 
     xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
     xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
-    //xTaskCreate(sensing_task, "sensing_task", 256, NULL, 2, NULL);
+    xTaskCreate(sensing_task, "sensing_task", 256, NULL, 2, NULL);
 }
