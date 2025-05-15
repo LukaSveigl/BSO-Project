@@ -76,7 +76,7 @@ void receive_task(void *pvParameters) {
                 receive_from_device(i, &receive_payload, sizeof(payload_t));
 
                 printf(
-                    "Received from %d: Temperature: %.2f C, Pressure: %.2f hPa\n",
+                    "Received from %d: Temperature: %.2f C, Pressure: %.2f Pa\n",
                     receive_payload.data,
                     receive_payload.bmp280_data.temperature,
                     receive_payload.bmp280_data.pressure
@@ -101,7 +101,7 @@ void sensing_task(void *pvParameters) {
         send_payload.bmp280_data.temperature = bmp280_data.temperature;
         send_payload.bmp280_data.pressure = bmp280_data.pressure;
 
-        printf("Temperature: %.2f C, Pressure: %.2f hPa\n", bmp280_data.temperature, bmp280_data.pressure);
+        printf("Temperature: %.2f C, Pressure: %.2f Pa\n", bmp280_data.temperature, bmp280_data.pressure);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
