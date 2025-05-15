@@ -95,7 +95,9 @@ void receive_task(void *pvParameters) {
 void sensing_task(void *pvParameters) {
     while (1) {
         // Note: This should be removed, only the payload data should remain.
+        gpio_write(CS_NRF, 1);
         bmp280_data.temperature = read_bmp280(BMP280_TEMPERATURE);
+        gpio_write(CS_NRF, 1);
         bmp280_data.pressure = read_bmp280(BMP280_PRESSURE);
 
         send_payload.bmp280_data.temperature = bmp280_data.temperature;
@@ -127,8 +129,8 @@ void user_init(void){
     uart_set_baud(0, 115200);
     init_values();
 
-    init_bmp280(BUS_I2C);
     init_nrf24();
+    init_bmp280(BUS_I2C);
 
     xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
     xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
