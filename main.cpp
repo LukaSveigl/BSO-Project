@@ -55,6 +55,17 @@ payload_t send_payload;
 void transmit_task(void *pvParameters) {
     while (1) {
         for (int i = 0; i < NUM_DEVICES - 1; i++) {
+            gpio_write(CS_NRF, 1);
+            send_payload.bmp280_data.temperature = read_bmp280(BMP280_TEMPERATURE);
+            gpio_write(CS_NRF, 1);
+            send_payload.bmp280_data.pressure = read_bmp280(BMP280_PRESSURE);
+
+            printf("Sending to %d: Temperature: %.2f C, Pressure: %.2f Pa\n",
+                   send_payload.data,
+                   send_payload.bmp280_data.temperature,
+                   send_payload.bmp280_data.pressure);
+
+
             const uint8_t device_id = reading_device_ids[i];
             send_to_device(device_id, &send_payload, sizeof(payload_t));
 
@@ -136,5 +147,5 @@ void user_init(void){
 
     xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
     xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
-    xTaskCreate(sensing_task, "sensing_task", 256, NULL, 2, NULL);
+    //xTaskCreate(sensing_task, "sensing_task", 256, NULL, 2, NULL);
 }
