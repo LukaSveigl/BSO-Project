@@ -32,7 +32,7 @@ bmp280_data_t bmp280_data;
  */
 typedef struct {
     bmp280_data_t bmp280_data;
-    const int data = DEVICE_ID;
+    int data = DEVICE_ID;
 } payload_t;
 
 /**
@@ -51,7 +51,17 @@ void transmit_task(void *pvParameters) {
     while (1) {
         for (int i = 0; i < NUM_DEVICES - 1; i++) {
             const uint8_t device_id = reading_device_ids[i];
-            send_to_device(device_id, &send_payload, sizeof(payload_t));
+
+            send_payload.data = DEVICE_ID;
+
+            printf(
+                "Sending to %d: Temperature: %.2f C, Pressure: %.2f Pa\n",
+                device_id,
+                send_payload.bmp280_data.temperature,
+                send_payload.bmp280_data.pressure
+            );
+
+            send_to_device(i, &send_payload, sizeof(payload_t));
 
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
@@ -68,7 +78,8 @@ void receive_task(void *pvParameters) {
     while (1) {
         if (radio.available()) {
             for (int i = 0; i < NUM_DEVICES - 1; i++) {
-                receive_from_device(i, &receive_payload, sizeof(payload_t));
+                const uint8_t device_id = reading_device_ids[i];
+                receive_from_device(device_id, &receive_payload, sizeof(payload_t));
 
                 printf(
                     "Received from %d: Temperature: %.2f C, Pressure: %.2f Pa\n",
