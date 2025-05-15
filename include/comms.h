@@ -12,12 +12,7 @@
 #include "RF24/nRF24L01.h"
 #include "RF24/RF24.h"
 
-#define CE_NRF		3
-#define CS_NRF		0
-#define channel		33
-
-#define DEVICE_ID    0x01
-#define GROUP_PREFIX 0xDE, 0xAD, 0xBE, 0xEF
+#include "defs.h"
 
 /**
  * Definitions of the addresses for the devices in the group.

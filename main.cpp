@@ -19,12 +19,7 @@
 #include "include/election.h"
 #include "include/sensing.h"
 
-#define BUS_I2C 0
-
-#define NUM_DEVICES 3
-
-#define tx_size 6
-static const char tx_buffer[tx_size] = "hello";
+#include "include/defs.h"
 
 /**
  * The BMP280 sensor data structure.
@@ -95,15 +90,8 @@ void receive_task(void *pvParameters) {
 void sensing_task(void *pvParameters) {
     while (1) {
         // Note: This should be removed, only the payload data should remain.
-        gpio_write(CS_NRF, 1);
-        i2c_init(BUS_I2C, SCL, SDA, I2C_FREQ_100K);
-        bmp280_data.temperature = read_bmp280(BMP280_TEMPERATURE);
-        gpio_write(CS_NRF, 1);
-        i2c_init(BUS_I2C, SCL, SDA, I2C_FREQ_100K);
-        bmp280_data.pressure = read_bmp280(BMP280_PRESSURE);
-
-        send_payload.bmp280_data.temperature = bmp280_data.temperature;
-        send_payload.bmp280_data.pressure = bmp280_data.pressure;
+        send_payload.bmp280_data.temperature = read_bmp280(BMP280_TEMPERATURE);
+        send_payload.bmp280_data.pressure = read_bmp280(BMP280_PRESSURE);
 
         printf("Temperature: %.2f C, Pressure: %.2f Pa\n", bmp280_data.temperature, bmp280_data.pressure);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -133,7 +121,6 @@ void user_init(void){
 
     gpio_write(CS_NRF, 1);
     gpio_enable(CS_NRF, GPIO_OUTPUT);
-    gpio_enable(SCL, GPIO_OUTPUT);
     init_bmp280(BUS_I2C);
     init_nrf24();
 

@@ -9,10 +9,7 @@
 #include "task.h"
 #include "i2c/i2c.h"
 
-#define PCF_ADDRESS	0x38
-#define MPU_ADDRESS	0x68
-#define SCL 14
-#define SDA 12
+#include "defs.h"
 
 /**
  * The definitions of the BMP280 sensor quantities.
@@ -41,7 +38,7 @@ bmp280_t bmp280_device;
  */
 inline void init_bmp280(int i2c_bus) {
     i2c_init(i2c_bus, SCL, SDA, I2C_FREQ_100K);
-    //gpio_enable(SCL, GPIO_OUTPUT);
+    gpio_enable(SCL, GPIO_OUTPUT);
 
     bmp280_params_t params;
     bmp280_init_default_params(&params);
@@ -60,6 +57,9 @@ inline void init_bmp280(int i2c_bus) {
  * @return The value of the requested quantity.
  */
 inline float read_bmp280(const bmp280_quantity quantity) {
+    gpio_write(CS_NRF, 1);
+    i2c_init(BUS_I2C, SCL, SDA, I2C_FREQ_100K);
+
     float temperature;
     float pressure;
 

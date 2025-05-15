@@ -9,4 +9,5 @@ add_executable(BSO_Project
         include/comms.h
         include/election.h
         include/sensing.h
+        include/defs.h
         main.cpp)
