@@ -129,8 +129,10 @@ void user_init(void){
     uart_set_baud(0, 115200);
     init_values();
 
-    init_nrf24();
+    gpio_write(CS_NRF, 1);
+    gpio_enable(CS_NRF, GPIO_OUTPUT);
     init_bmp280(BUS_I2C);
+    init_nrf24();
 
     xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
     xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
