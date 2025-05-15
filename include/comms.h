@@ -16,6 +16,9 @@
 #define CS_NRF		0
 #define channel		33
 
+#define SCL 		14
+#define SDA 		12
+
 #define DEVICE_ID    0x01
 #define GROUP_PREFIX 0xDE, 0xAD, 0xBE, 0xEF
 
@@ -39,6 +42,7 @@ static RF24 radio(CE_NRF, CS_NRF);
  * @return The device IDs of the other devices in the group.
  */
 inline void init_nrf24() {
+    gpio_enable(SCL, GPIO_OUTPUT);
     gpio_enable(CS_NRF, GPIO_OUTPUT);
 
     radio.begin();
