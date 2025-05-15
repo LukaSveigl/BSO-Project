@@ -21,6 +21,8 @@
 
 #include "include/defs.h"
 
+SemaphoreHandle_t x_radio_mutex;
+
 /**
  * The BMP280 sensor data structure.
  */
@@ -52,16 +54,10 @@ void transmit_task(void *pvParameters) {
         for (int i = 0; i < NUM_DEVICES - 1; i++) {
             const uint8_t device_id = reading_device_ids[i];
 
+            xSemaphoreTake(x_radio_mutex, portMAX_DELAY);
             send_payload.data = DEVICE_ID;
-
-            /*printf(
-                "Sending to %d: Temperature: %.2f C, Pressure: %.2f Pa\n",
-                device_id,
-                send_payload.bmp280_data.temperature,
-                send_payload.bmp280_data.pressure
-            );*/
-
             send_to_device(i, &send_payload, sizeof(payload_t));
+            xSemaphoreGive(x_radio_mutex);
 
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
@@ -91,6 +87,7 @@ void receive_task(void *pvParameters) {
             }
         }*/
         uint8_t pipe;
+        xSemaphoreTake(x_radio_mutex, portMAX_DELAY);
         if (radio.available(&pipe)) {
             receive_from_device(pipe, &receive_payload, sizeof(payload_t));
 
@@ -100,9 +97,9 @@ void receive_task(void *pvParameters) {
                 receive_payload.bmp280_data.temperature,
                 receive_payload.bmp280_data.pressure
             );
-
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
+        xSemaphoreGive(x_radio_mutex);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 

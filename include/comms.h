@@ -2,6 +2,7 @@
 #define COMMS_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 #include "espressif/esp_common.h"
 #include "esp/uart.h"
@@ -60,17 +61,20 @@ inline void init_nrf24() {
 /**
  * Sends data to a specific device.
  *
- * @param device_id The ID of the device to send data to.
- * @param data      The data to send.
- * @param length    The length of the data.
+ * @param device_index The index of the device address to send data to.
+ * @param data         The data to send.
+ * @param length       The length of the data.
  */
-inline void send_to_device(const uint8_t device_id, const void* data, uint8_t length) {
-    radio.powerUp();
+inline void send_to_device(const uint8_t device_index, const void* data, uint8_t length) {
+    //radio.powerUp();
     radio.stopListening();
-    radio.openWritingPipe(addresses[device_id]);
-    radio.write(data, length);
+    radio.openWritingPipe(addresses[device_index]);
+    int success = radio.write(data, length);
+    if (!success) {
+        printf("Failed to write to device\n");
+    }
     radio.startListening();
-    radio.powerDown();
+    //radio.powerDown();
 }
 
 /**
@@ -82,9 +86,9 @@ inline void send_to_device(const uint8_t device_id, const void* data, uint8_t le
  */
 inline void receive_from_device(uint8_t pipe, void* data, uint8_t length) {
     //if (radio.available(&pipe)) {
-    radio.powerUp();
+    //radio.powerUp();
     radio.read(data, length);
-    radio.powerDown();
+    //radio.powerDown();
     //}
 }
 
