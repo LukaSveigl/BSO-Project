@@ -76,7 +76,7 @@ void transmit_task(void *pvParameters) {
  */
 void receive_task(void *pvParameters) {
     while (1) {
-        if (radio.available()) {
+        /*if (radio.available()) {
             for (int i = 0; i < NUM_DEVICES - 1; i++) {
                 const uint8_t device_id = reading_device_ids[i];
                 receive_from_device(device_id, &receive_payload, sizeof(payload_t));
@@ -89,6 +89,17 @@ void receive_task(void *pvParameters) {
                 );
                 vTaskDelay(1000 / portTICK_PERIOD_MS);
             }
+        }*/
+        uint8_t pipe;
+        if (radio.available(&pipe)) {
+            receive_from_device(pipe, &receive_payload, sizeof(payload_t));
+
+            printf(
+                "Received from %d: Temperature: %.2f C, Pressure: %.2f Pa\n",
+                receive_payload.data,
+                receive_payload.bmp280_data.temperature,
+                receive_payload.bmp280_data.pressure
+            );
         }
     }
 }

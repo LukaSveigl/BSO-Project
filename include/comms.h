@@ -83,7 +83,7 @@ inline void send_to_device(const uint8_t device_id, const void* data, uint8_t le
 inline void receive_from_device(uint8_t pipe, void* data, uint8_t length) {
     //if (radio.available(&pipe)) {
     radio.powerUp();
-    radio.read(&data, length);
+    radio.read(data, length);
     radio.powerDown();
     //}
 }
