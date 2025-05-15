@@ -65,10 +65,12 @@ inline void init_nrf24() {
  * @param length    The length of the data.
  */
 inline void send_to_device(const uint8_t device_id, const void* data, uint8_t length) {
+    radio.powerUp();
     radio.stopListening();
     radio.openWritingPipe(addresses[device_id]);
     radio.write(data, length);
     radio.startListening();
+    radio.powerDown();
 }
 
 /**
@@ -79,9 +81,11 @@ inline void send_to_device(const uint8_t device_id, const void* data, uint8_t le
  * @param length The length of the data to receive.
  */
 inline void receive_from_device(uint8_t pipe, void* data, uint8_t length) {
-    if (radio.available(&pipe)) {
-        radio.read(data, length);
-    }
+    //if (radio.available(&pipe)) {
+    radio.powerUp();
+    radio.read(&data, length);
+    radio.powerDown();
+    //}
 }
 
 #endif
