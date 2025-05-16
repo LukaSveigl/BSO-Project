@@ -115,11 +115,11 @@ void sensing_task(void *pvParameters) {
         send_payload.bmp280_data.temperature = read_bmp280(BMP280_TEMPERATURE);
         send_payload.bmp280_data.pressure = read_bmp280(BMP280_PRESSURE);
 
-        /*printf(
+        printf(
             "Temperature: %.2f C, Pressure: %.2f Pa\n",
             send_payload.bmp280_data.temperature,
             send_payload.bmp280_data.pressure
-        );*/
+        );
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
