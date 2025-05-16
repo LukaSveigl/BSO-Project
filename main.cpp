@@ -71,7 +71,9 @@ void receive_task(void *pvParameters) {
     while (1) {
         uint8_t pipe;
         if (radio.available()) {
-            receive_from_device(pipe, &receive_payload, sizeof(payload_t));
+            //receive_from_device(pipe, &receive_payload, sizeof(payload_t));
+
+            radio.read(&receive_payload, sizeof(payload_t));
 
             printf(
                 "Received from %d: Temperature: %.2f C, Pressure: %.2f Pa\n",
