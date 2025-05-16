@@ -98,6 +98,8 @@ void receive_task(void *pvParameters) {
                 receive_payload.bmp280_data.temperature,
                 receive_payload.bmp280_data.pressure
             );
+        } else {
+            printf("No data available\n");
         }
         xSemaphoreGive(x_radio_mutex);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
