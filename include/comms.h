@@ -78,7 +78,9 @@ inline int send_to_device(const uint8_t device_index, const void* data, uint8_t 
     //radio.openWritingPipe(addresses[device_index]);
     radio.openWritingPipe(addresses[0]); // Device ID: 0x01
     //radio.openWritingPipe(addresses[1]); // Device ID: 0x02
+    radio.powerUp();
     int success = radio.write(data, length);
+    radio.powerDown();
     if (!success) {
         printf("Failed to write to device\n");
     }
@@ -96,9 +98,9 @@ inline int send_to_device(const uint8_t device_index, const void* data, uint8_t 
  */
 inline void receive_from_device(uint8_t pipe, void* data, uint8_t length) {
     //if (radio.available(&pipe)) {
-    //radio.powerUp();
+    radio.powerUp();
     radio.read(data, length);
-    //radio.powerDown();
+    radio.powerDown();
     //}
 }
 
