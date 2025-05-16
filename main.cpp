@@ -72,7 +72,7 @@ void receive_task(void *pvParameters) {
         if (radio.available()) {
             //receive_from_device(pipe, &receive_payload, sizeof(payload_t));
 
-
+            radio.startListening();
             radio.read(&receive_payload, sizeof(payload_t));
 
             printf(
