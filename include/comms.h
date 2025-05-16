@@ -43,9 +43,9 @@ inline void init_nrf24() {
 
     radio.setPALevel(RF24_PA_HIGH);
 
-    //radio.openReadingPipe(1, addresses[0]);
-    radio.openReadingPipe(2, addresses[1]);
-    radio.openReadingPipe(3, addresses[2]);
+    //radio.openReadingPipe(1, addresses[0]); // Device ID: 0x01
+    radio.openReadingPipe(2, addresses[1]);   // Device ID: 0x02
+    radio.openReadingPipe(3, addresses[2]);   // Device ID: 0x03
 
 
     // Open reading pipes to all other devices.
@@ -76,8 +76,8 @@ inline int send_to_device(const uint8_t device_index, const void* data, uint8_t 
     //radio.powerUp();
     radio.stopListening();
     //radio.openWritingPipe(addresses[device_index]);
-    //radio.openWritingPipe(addresses[0]);
-    radio.openWritingPipe(addresses[1]);
+    radio.openWritingPipe(addresses[0]); // Device ID: 0x01
+    //radio.openWritingPipe(addresses[1]); // Device ID: 0x02
     int success = radio.write(data, length);
     if (!success) {
         printf("Failed to write to device\n");
