@@ -53,12 +53,8 @@ payload_t send_payload;
 void transmit_task(void *pvParameters) {
     while (1) {
         for (int i = 0; i < NUM_DEVICES - 1; i++) {
-            const uint8_t device_id = reading_device_ids[i];
-
-            //xSemaphoreTake(x_radio_mutex, portMAX_DELAY);
             send_payload.data = DEVICE_ID;
             send_to_device(i, &send_payload, sizeof(payload_t));
-            //xSemaphoreGive(x_radio_mutex);
 
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
@@ -73,26 +69,8 @@ void transmit_task(void *pvParameters) {
  */
 void receive_task(void *pvParameters) {
     while (1) {
-        /*if (radio.available()) {
-            for (int i = 0; i < NUM_DEVICES - 1; i++) {
-                const uint8_t device_id = reading_device_ids[i];
-                receive_from_device(device_id, &receive_payload, sizeof(payload_t));
-
-                printf(
-                    "Received from %d: Temperature: %.2f C, Pressure: %.2f Pa\n",
-                    receive_payload.data,
-                    receive_payload.bmp280_data.temperature,
-                    receive_payload.bmp280_data.pressure
-                );
-                vTaskDelay(1000 / portTICK_PERIOD_MS);
-            }
-        }*/
         uint8_t pipe;
-        //xSemaphoreTake(x_radio_mutex, portMAX_DELAY);
-        while(!radio.available(&pipe)) {
-        }
-
-        if (radio.available(&pipe)) {
+        if (radio.available()) {
             receive_from_device(pipe, &receive_payload, sizeof(payload_t));
 
             printf(
@@ -104,37 +82,6 @@ void receive_task(void *pvParameters) {
         } else {
             printf("No data available\n");
         }
-        //xSemaphoreGive(x_radio_mutex);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
-
-void communication_task(void *pvParameters) {
-    while (1) {
-        // Write data to all other devices.
-        for (int i = 0; i < NUM_DEVICES - 1; i++) {
-            int success = send_to_device(i, &send_payload, sizeof(payload_t));
-            printf("Sent to %d: %d\n", i, success);
-        }
-
-        // Read data from all other devices.
-        while (!radio.available()) {
-            // Wait for data to be available.
-        }
-
-        if (radio.available()) {
-            uint8_t pipe;
-            radio.read(&receive_payload, sizeof(payload_t));
-            printf(
-                "Received from %d: Temperature: %.2f C, Pressure: %.2f Pa\n",
-                receive_payload.data,
-                receive_payload.bmp280_data.temperature,
-                receive_payload.bmp280_data.pressure
-            );
-        } else {
-            printf("No data available\n");
-        }
-
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
@@ -185,8 +132,8 @@ void user_init(void){
     init_bmp280(BUS_I2C);
     init_nrf24();
 
-    xTaskCreate(communication_task, "communication_task", 256, NULL, 2, NULL);
-    //xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
-    //xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
+    //xTaskCreate(communication_task, "communication_task", 256, NULL, 2, NULL);
+    xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
+    xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
     xTaskCreate(sensing_task, "sensing_task", 256, NULL, 2, NULL);
 }
