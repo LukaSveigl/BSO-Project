@@ -15,10 +15,15 @@
 #include "RF24/nRF24L01.h"
 #include "RF24/RF24.h"
 
+#include <semphr.h>
+
 #include "include/comms.h"
 #include "include/election.h"
 #include "include/sensing.h"
 #include "include/defs.h"
+
+// The semaphore used to synchronize transmission and reception tasks.
+SemaphoreHandle_t xSemaphore = NULL;
 
 /**
  * The BMP280 sensor data structure.
@@ -50,7 +55,9 @@ void transmit_task(void *pvParameters) {
     while (1) {
         for (int i = 0; i < NUM_DEVICES - 1; i++) {
             send_payload.data = DEVICE_ID;
+            xSemaphoreTake(xSemaphore, portMAX_DELAY);
             send_to_device(i, &send_payload, sizeof(payload_t));
+            xSemaphoreGive(xSemaphore);
 
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
@@ -69,6 +76,7 @@ void receive_task(void *pvParameters) {
 
     while (1) {
         uint8_t pipe;
+        xSemaphoreTake(xSemaphore, portMAX_DELAY);
         if (radio.available()) {
             //receive_from_device(pipe, &receive_payload, sizeof(payload_t));
 
@@ -84,6 +92,7 @@ void receive_task(void *pvParameters) {
         } else {
             printf("No data available\n");
         }
+        xSemaphoreGive(xSemaphore);
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
@@ -128,6 +137,9 @@ extern "C" void user_init(void);
 void user_init(void){
     uart_set_baud(0, 115200);
     init_values();
+
+    // Create the semaphore used for synchronization.
+    xSemaphore = xSemaphoreCreateMutex();
 
     gpio_write(CS_NRF, 1);
     gpio_enable(CS_NRF, GPIO_OUTPUT);
