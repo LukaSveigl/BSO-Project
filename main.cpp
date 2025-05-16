@@ -55,10 +55,10 @@ void transmit_task(void *pvParameters) {
         for (int i = 0; i < NUM_DEVICES - 1; i++) {
             const uint8_t device_id = reading_device_ids[i];
 
-            xSemaphoreTake(x_radio_mutex, portMAX_DELAY);
+            //xSemaphoreTake(x_radio_mutex, portMAX_DELAY);
             send_payload.data = DEVICE_ID;
             send_to_device(i, &send_payload, sizeof(payload_t));
-            xSemaphoreGive(x_radio_mutex);
+            //xSemaphoreGive(x_radio_mutex);
 
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
@@ -88,7 +88,7 @@ void receive_task(void *pvParameters) {
             }
         }*/
         uint8_t pipe;
-        xSemaphoreTake(x_radio_mutex, portMAX_DELAY);
+        //xSemaphoreTake(x_radio_mutex, portMAX_DELAY);
         if (radio.available(&pipe)) {
             receive_from_device(pipe, &receive_payload, sizeof(payload_t));
 
@@ -101,7 +101,7 @@ void receive_task(void *pvParameters) {
         } else {
             printf("No data available\n");
         }
-        xSemaphoreGive(x_radio_mutex);
+        //xSemaphoreGive(x_radio_mutex);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
@@ -152,7 +152,11 @@ void user_init(void){
     init_bmp280(BUS_I2C);
     init_nrf24();
 
-    xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
-    xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
+    if (DEVICE_ID == 0x01) {
+        xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
+    } else {
+        xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
+    }
+
     xTaskCreate(sensing_task, "sensing_task", 256, NULL, 2, NULL);
 }
