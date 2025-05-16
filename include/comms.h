@@ -41,7 +41,7 @@ inline void init_nrf24() {
     radio.begin();
     radio.setChannel(channel);
 
-    radio.setPALevel(RF24_PA_HIGH);
+    radio.setPALevel(RF24_PA_MAX);
 
     //radio.openReadingPipe(1, addresses[0]); // Device ID: 0x01
     radio.openReadingPipe(2, addresses[1]);   // Device ID: 0x02
@@ -62,7 +62,7 @@ inline void init_nrf24() {
     const uint8_t target_index = (DEVICE_ID + 1) % (sizeof(addresses) / sizeof(addresses[0]));
     radio.openWritingPipe(addresses[target_index]);*/
 
-    radio.startListening();
+    //radio.startListening();
 }
 
 /**

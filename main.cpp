@@ -68,11 +68,14 @@ void transmit_task(void *pvParameters) {
  * @param pvParameters The parameters passed to the task.
  */
 void receive_task(void *pvParameters) {
+    radio.powerUp();
+
     while (1) {
         uint8_t pipe;
         if (radio.available()) {
             //receive_from_device(pipe, &receive_payload, sizeof(payload_t));
 
+            radio.startListening();
             radio.read(&receive_payload, sizeof(payload_t));
 
             printf(
@@ -135,7 +138,7 @@ void user_init(void){
     init_nrf24();
 
     //xTaskCreate(communication_task, "communication_task", 256, NULL, 2, NULL);
-    xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
-    xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
+    xTaskCreate(transmit_task, "transmit_task", 1000, NULL, 2, NULL);
+    xTaskCreate(receive_task, "receive_task", 1000, NULL, 2, NULL);
     xTaskCreate(sensing_task, "sensing_task", 256, NULL, 2, NULL);
 }
