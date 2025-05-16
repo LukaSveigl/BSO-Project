@@ -109,6 +109,35 @@ void receive_task(void *pvParameters) {
     }
 }
 
+void communication_task(void *pvParameters) {
+    while (1) {
+        // Write data to all other devices.
+        for (int i = 0; i < NUM_DEVICES - 1; i++) {
+            send_to_device(i, &send_payload, sizeof(payload_t));
+        }
+
+        // Read data from all other devices.
+        while (!radio.available()) {
+            // Wait for data to be available.
+        }
+
+        if (radio.available()) {
+            uint8_t pipe;
+            radio.read(&receive_payload, sizeof(payload_t));
+            printf(
+                "Received from %d: Temperature: %.2f C, Pressure: %.2f Pa\n",
+                receive_payload.data,
+                receive_payload.bmp280_data.temperature,
+                receive_payload.bmp280_data.pressure
+            );
+        } else {
+            printf("No data available\n");
+        }
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
 /**
  * Sensing task that reads temperature and pressure from the BMP280 sensor.
  *
@@ -155,7 +184,8 @@ void user_init(void){
     init_bmp280(BUS_I2C);
     init_nrf24();
 
-    xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
-    xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
+    xTaskCreate(communication_task, "communication_task", 256, NULL, 2, NULL);
+    //xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
+    //xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
     xTaskCreate(sensing_task, "sensing_task", 256, NULL, 2, NULL);
 }
