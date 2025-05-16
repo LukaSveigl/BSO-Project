@@ -41,8 +41,15 @@ inline void init_nrf24() {
     radio.begin();
     radio.setChannel(channel);
 
+    radio.setPALevel(RF24_PA_HIGH);
+
+    //radio.openReadingPipe(1, addresses[0]);
+    radio.openReadingPipe(2, addresses[1]);
+    radio.openReadingPipe(3, addresses[2]);
+
+
     // Open reading pipes to all other devices.
-    uint8_t pipe = 1;
+    /*uint8_t pipe = 1;
     for (unsigned int i = 0; i < sizeof(addresses) / sizeof(addresses[0]); i++) {
         if (addresses[i][4] != DEVICE_ID) {
             radio.openReadingPipe(pipe, addresses[i]);
@@ -53,7 +60,7 @@ inline void init_nrf24() {
 
     // Open the writing pipe to one peer. Default is the next device - round-robin.
     const uint8_t target_index = (DEVICE_ID + 1) % (sizeof(addresses) / sizeof(addresses[0]));
-    radio.openWritingPipe(addresses[target_index]);
+    radio.openWritingPipe(addresses[target_index]);*/
 
     radio.startListening();
 }
@@ -65,16 +72,19 @@ inline void init_nrf24() {
  * @param data         The data to send.
  * @param length       The length of the data.
  */
-inline void send_to_device(const uint8_t device_index, const void* data, uint8_t length) {
+inline int send_to_device(const uint8_t device_index, const void* data, uint8_t length) {
     //radio.powerUp();
     radio.stopListening();
-    radio.openWritingPipe(addresses[device_index]);
+    //radio.openWritingPipe(addresses[device_index]);
+    //radio.openWritingPipe(addresses[0]);
+    radio.openWritingPipe(addresses[1]);
     int success = radio.write(data, length);
     if (!success) {
         printf("Failed to write to device\n");
     }
     radio.startListening();
     //radio.powerDown();
+    return success;
 }
 
 /**

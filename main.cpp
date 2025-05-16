@@ -113,7 +113,8 @@ void communication_task(void *pvParameters) {
     while (1) {
         // Write data to all other devices.
         for (int i = 0; i < NUM_DEVICES - 1; i++) {
-            send_to_device(i, &send_payload, sizeof(payload_t));
+            int success = send_to_device(i, &send_payload, sizeof(payload_t));
+            printf("Sent to %d: %d\n", i, success);
         }
 
         // Read data from all other devices.
