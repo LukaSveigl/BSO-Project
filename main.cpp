@@ -15,14 +15,10 @@
 #include "RF24/nRF24L01.h"
 #include "RF24/RF24.h"
 
-#include <semphr.h>
-
 #include "include/comms.h"
 #include "include/election.h"
 #include "include/sensing.h"
 #include "include/defs.h"
-
-SemaphoreHandle_t x_radio_mutex;
 
 /**
  * The BMP280 sensor data structure.
@@ -69,13 +65,14 @@ void transmit_task(void *pvParameters) {
  */
 void receive_task(void *pvParameters) {
     radio.powerUp();
+    radio.startListening();
 
     while (1) {
         uint8_t pipe;
         if (radio.available()) {
             //receive_from_device(pipe, &receive_payload, sizeof(payload_t));
 
-            radio.startListening();
+
             radio.read(&receive_payload, sizeof(payload_t));
 
             printf(
