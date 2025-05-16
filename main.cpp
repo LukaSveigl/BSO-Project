@@ -89,6 +89,9 @@ void receive_task(void *pvParameters) {
         }*/
         uint8_t pipe;
         //xSemaphoreTake(x_radio_mutex, portMAX_DELAY);
+        while(!radio.available(&pipe)) {
+        }
+
         if (radio.available(&pipe)) {
             receive_from_device(pipe, &receive_payload, sizeof(payload_t));
 
