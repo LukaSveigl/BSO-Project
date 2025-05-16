@@ -84,7 +84,7 @@ void receive_task(void *pvParameters) {
         } else {
             printf("No data available\n");
         }
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }
 
