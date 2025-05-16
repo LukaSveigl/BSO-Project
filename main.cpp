@@ -155,11 +155,7 @@ void user_init(void){
     init_bmp280(BUS_I2C);
     init_nrf24();
 
-    if (DEVICE_ID == 0x01) {
-        xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
-    } else {
-        xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
-    }
-
+    xTaskCreate(transmit_task, "transmit_task", 256, NULL, 2, NULL);
+    xTaskCreate(receive_task, "receive_task", 256, NULL, 2, NULL);
     xTaskCreate(sensing_task, "sensing_task", 256, NULL, 2, NULL);
 }
