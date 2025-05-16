@@ -22,9 +22,6 @@
 #include "include/sensing.h"
 #include "include/defs.h"
 
-// The semaphore used to synchronize transmission and reception tasks.
-SemaphoreHandle_t xSemaphore = NULL;
-
 /**
  * The BMP280 sensor data structure.
  */
@@ -55,9 +52,7 @@ void transmit_task(void *pvParameters) {
     while (1) {
         for (int i = 0; i < NUM_DEVICES - 1; i++) {
             send_payload.data = DEVICE_ID;
-            xSemaphoreTake(xSemaphore, portMAX_DELAY);
             send_to_device(i, &send_payload, sizeof(payload_t));
-            xSemaphoreGive(xSemaphore);
 
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
@@ -76,7 +71,6 @@ void receive_task(void *pvParameters) {
 
     while (1) {
         uint8_t pipe;
-        xSemaphoreTake(xSemaphore, portMAX_DELAY);
         if (radio.available()) {
             //receive_from_device(pipe, &receive_payload, sizeof(payload_t));
 
@@ -92,8 +86,8 @@ void receive_task(void *pvParameters) {
         } else {
             printf("No data available\n");
         }
-        xSemaphoreGive(xSemaphore);
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        //vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
@@ -104,7 +98,6 @@ void receive_task(void *pvParameters) {
  */
 void sensing_task(void *pvParameters) {
     while (1) {
-        // Note: This should be removed, only the payload data should remain.
         send_payload.bmp280_data.temperature = read_bmp280(BMP280_TEMPERATURE);
         send_payload.bmp280_data.pressure = read_bmp280(BMP280_PRESSURE);
 
@@ -137,9 +130,6 @@ extern "C" void user_init(void);
 void user_init(void){
     uart_set_baud(0, 115200);
     init_values();
-
-    // Create the semaphore used for synchronization.
-    xSemaphore = xSemaphoreCreateMutex();
 
     gpio_write(CS_NRF, 1);
     gpio_enable(CS_NRF, GPIO_OUTPUT);
